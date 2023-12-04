@@ -50,7 +50,7 @@ class mCNN(nn.Module):
 
 # 初始化模型和优化器
 cnn_model = mCNN()
-criterion = nn.MSELoss()
+criterion = nn.BCELoss()
 optimizer = optim.Adam(cnn_model.parameters(), lr=0.001)
 
 # 训练模型
@@ -96,7 +96,7 @@ optimizer_state = optimizer.state_dict()
 epoch = num_epochs  # 保存当前训练的轮数
 
 # 指定保存模型的文件路径
-save_path = 't_cnn.pth'  # 请替换为你的文件路径
+save_path = 't_cnn_bloss.pth'  # 请替换为你的文件路径
 
 # 创建一个字典来保存模型相关信息
 model_info = {
