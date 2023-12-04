@@ -117,7 +117,7 @@ chan(nn*8+1e3*3+1:nn*8+1e3*4,4)=dlchs(dlch2);
 u=@(t) 1*exp(1j*pi*B*t).*sin(pi*B*t)./(pi*B*t);
 % pq= @(t,tau,v,q) u(t-tau-q'*T).*exp(1j*2*pi*v*q'*T);
 % p= @(t,tau,v) sum(pq(t,tau,v,(0:N-1)),1);
-sig=@(k,l) sum(u(t-k/B/128*M-(0:N-1)'*T).*exp(1j*2*pi*l/Tw/128*N*(0:N-1)'*T),1);%输入index,里面已经除128了
+sig=@(k,l,t) sum(u(t-k/B/128*M-(0:N-1)'*T).*exp(1j*2*pi*l/Tw/128*N*(0:N-1)'*T),1);%输入index,里面已经除128了
 %% 信道/回波
 % for i=1:n_path
 %     taui=delay_taps(i)/B;
@@ -129,7 +129,7 @@ sig=@(k,l) sum(u(t-k/B/128*M-(0:N-1)'*T).*exp(1j*2*pi*l/Tw/128*N*(0:N-1)'*T),1);
 % r_mat = reshape(r1(1:N*M),M,N); 
 % Y = fft(r_mat)/sqrt(M); % Wigner transform
 
-sig_train=zeros(num_train,128*128);
+sig_train=zeros(num_train,N*M);
 for i=1:num_train
     tmp=sig(chan(i,1),chan(i,2))*chan2(i,1);
     Y1=downsample(tmp,round(1/B/dt));
@@ -141,7 +141,7 @@ for i=1:num_train
     % r1=downsample(tmp,round(1/B/dt));
     % r_mat = reshape(r1(1:N*M),M,N); 
     % Y2 = fft(r_mat)/sqrt(M); % Wigner transform
-    sig_train(i,:)=reshape(A'*(Y1+Y2),1,[]);%按列读取，先列后行
+    sig_train(i,:)=reshape((Y1+Y2),1,[]);%按列读取，先列后行
 end
 random_index=randperm(num_train);
 chan=chan(random_index,:);

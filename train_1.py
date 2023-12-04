@@ -39,14 +39,13 @@ class mCNN(nn.Module):
         self.conv3 = nn.Conv1d(6, 3, kernel_size=5, padding='same')
         self.conv4 = nn.Conv1d(3, 1, kernel_size=3, padding='same')
         self.activation = nn.Tanh()
-        self.sigmoid=nn.Sigmoid()
  
 
     def forward(self, x):
         x = self.activation(self.conv1(x))
         x = self.activation(self.conv2(x))
         x = self.activation(self.conv3(x))
-        x = self.sigmoid(self.conv4(x))
+        x = self.activation(self.conv4(x))
         return x
 
 # 初始化模型和优化器
@@ -73,7 +72,7 @@ for epoch in range(num_epochs):
             label_tensor[i,0,int(tmp[0]*128+tmp[1])]=1
             label_tensor[i,0,int(tmp[2]*128+tmp[3])]=1
         output = cnn_model(batch_pro_r)
-        loss = criterion(output,label_tensor )
+        loss = criterion(output, label_tensor)
         loss.backward()
         optimizer.step()
         running_loss += loss.item()
@@ -114,17 +113,8 @@ plt.ioff()
 plt.show()
 # 验证模型
 with torch.no_grad():
-    batch_size=val_X.size(0)
-    batch_pro=torch.matmul(A,val_X.t())
-    batch_pro=batch_pro.t()
-    batch_pro_r=torch.stack((batch_pro.real,batch_pro.imag),dim=1)#代理谱
-    label_tensor=torch.zeros(batch_size,1, 128*128)#生成label
-    for i in range(batch_size):
-        tmp=val_y[i]
-        label_tensor[i,0,int(tmp[0]*128+tmp[1])]=1
-        label_tensor[i,0,int(tmp[2]*128+tmp[3])]=1
-    val_output = cnn_model(batch_pro_r)
-    val_loss = criterion(val_output, label_tensor)
+    val_output = cnn_model(val_X)
+    val_loss = criterion(val_output, val_y)
     print(f"Validation Loss: {val_loss.item()}")
 
 # 同样的方式，可以定义 DNN 模型并进行训练和验证
